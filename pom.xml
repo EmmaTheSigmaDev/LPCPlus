@@ -3,28 +3,32 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.wikmor</groupId>
-	<artifactId>lpc</artifactId>
-	<name>LPC</name>
+	<artifactId>lpcplus</artifactId>
+	<name>LPCPlus</name>
 	<description>A chat formatting plugin for LuckPerms.</description>
 	<version>3.6.2</version>
 	<packaging>jar</packaging>
 	
 	<properties>
 		<author>wikmor</author>
-		<main.class>me.wikmor.lpc.LPC</main.class>
+		<main.class>me.wikmor.lpcplus.LPCPlus</main.class>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
 	<repositories>
 		<repository>
-        	<id>spigot-repo</id>
-        	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-    	</repository>
-        <repository>
-            <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
+			<id>spigot-repo</id>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+		</repository>
+		<repository>
+			<id>papermc-repo</id>
+			<url>https://repo.papermc.io/repository/maven-public/</url>
+		</repository>
+		<repository>
+			<id>placeholderapi</id>
+			<url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+		</repository>
 	</repositories>
 	
 	<pluginRepositories>
@@ -41,6 +45,13 @@
            	<version>1.21.5-R0.1-SNAPSHOT</version>
         	<scope>provided</scope>
     	</dependency>
+		<dependency>
+			<groupId>io.papermc.paper</groupId>
+			<artifactId>paper-api</artifactId>
+			<version>1.21.5-R0.1-SNAPSHOT</version>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>

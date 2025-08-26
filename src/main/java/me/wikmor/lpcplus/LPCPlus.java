@@ -1,8 +1,6 @@
 package me.wikmor.lpcplus;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import org.bukkit.Bukkit;
@@ -20,33 +18,27 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.function.BiFunction;
 
 public final class LPCPlus extends JavaPlugin implements Listener {
 
 	private static final Pattern HEX_PATTERN = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
 	private LuckPerms luckPerms;
-	private boolean paperPresent;
 
 	@Override
 	public void onEnable() {
+		// Load LuckPerms
 		this.luckPerms = getServer().getServicesManager().load(LuckPerms.class);
+
 		saveDefaultConfig();
 		getServer().getPluginManager().registerEvents(this, this);
 
-		try {
-			Class.forName("io.papermc.paper.event.player.AsyncChatEvent");
-			paperPresent = true;
-			getLogger().info("✅ Paper detected, Adventure per-viewer chat enabled.");
-		} catch (ClassNotFoundException e) {
-			paperPresent = false;
-			getLogger().info("ℹ Running on Spigot, legacy chat only.");
-		}
+		getLogger().info("✅ LPCPlus enabled (Spigot/Paper compatible)");
 	}
 
 	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+	public boolean onCommand(final @NotNull CommandSender sender, final @NotNull Command command,
+							 final @NotNull String label, final String[] args) {
 		if (args.length == 1 && "reload".equalsIgnoreCase(args[0])) {
 			reloadConfig();
 			sender.sendMessage(colorize("&aLPCPlus has been reloaded."));
@@ -56,53 +48,28 @@ public final class LPCPlus extends JavaPlugin implements Listener {
 	}
 
 	@Override
-	public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+	public List<String> onTabComplete(final @NotNull CommandSender sender, final @NotNull Command command,
+									  final @NotNull String alias, final String[] args) {
 		if (args.length == 1) return Collections.singletonList("reload");
 		return Collections.emptyList();
 	}
 
+	// Legacy Spigot chat
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onChat(AsyncPlayerChatEvent event) {
-		Player player = event.getPlayer();
-		CachedMetaData metaData = luckPerms.getPlayerAdapter(Player.class).getMetaData(player);
-		String group = metaData.getPrimaryGroup();
+	public void onLegacyChat(final AsyncPlayerChatEvent event) {
+		final Player player = event.getPlayer();
+		final CachedMetaData metaData = luckPerms.getPlayerAdapter(Player.class).getMetaData(player);
+		final String group = metaData.getPrimaryGroup();
+
 		String format = buildFormat(player, metaData, group);
 		String message = applyMessageColors(player, event.getMessage());
-
-		if (!paperPresent) {
-			// Spigot fallback
-			event.setFormat(format.replace("{message}", message).replace("%", "%%"));
-			return;
-		}
-
-		// Paper Adventure per-viewer rendering
-		try {
-			Object asyncChatEvent = Class.forName("io.papermc.paper.event.player.AsyncChatEvent")
-					.cast(event);
-
-			// Use Adventure renderer lambda (per viewer)
-			BiFunction<Player, Component, Component> renderer = (viewer, msg) -> {
-				String perViewerFormat = format;
-				if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-					perViewerFormat = PlaceholderAPI.setPlaceholders(viewer, perViewerFormat);
-				}
-				String perViewerMessage = applyMessageColors(player, event.getMessage());
-				perViewerFormat = perViewerFormat.replace("{message}", perViewerMessage);
-				return LegacyComponentSerializer.legacySection().deserialize(perViewerFormat);
-			};
-
-			asyncChatEvent.getClass()
-					.getMethod("renderer", BiFunction.class)
-					.invoke(asyncChatEvent, renderer);
-
-		} catch (Exception ignored) {
-			// fails silently on Spigot
-		}
+		event.setFormat(format.replace("{message}", message).replace("%", "%%"));
 	}
 
 	private String buildFormat(Player player, CachedMetaData metaData, String group) {
-		String format = getConfig().getString(getConfig().getString("group-formats." + group) != null ?
-				"group-formats." + group : "chat-format");
+		String format = getConfig().getString(
+				getConfig().getString("group-formats." + group) != null ?
+						"group-formats." + group : "chat-format");
 
 		if (format == null) format = "{name}: {message}";
 

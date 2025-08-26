@@ -1,24 +1,43 @@
-# LPC Configuration
-# Please read the https://luckperms.net/wiki/Prefixes,-Suffixes-&-Meta before you set up.
+# =============================
+# LPCPlus Configuration Example
+# =============================
+#
+# This is a fully working example configuration for LPCPlus.
+# It supports LuckPerms prefixes, suffixes, colors, and PlaceholderAPI.
+# Reload config with /lpcplus reload
 #
 # Placeholders:
 # {message} - the chat message
-# {name} - the player's name
-# {displayname} - the player's display name / nickname
-# {world} - the world name of the player's current world
-# {prefix} - the player's highest priority prefix
-# {suffix} - the player's highest priority suffix
-# {prefixes} - the player's prefixes sorted by the highest priority
-# {suffixes} - the player's suffixes sorted by the highest priority
-# {username-color} - the player's or the group's username color
-# {message-color} - the player's or the group's message color
-#
-# To reload the configuration, run '/lpc reload' command. Make sure you have the 'lpc.reload' permission assigned.
-# More information can be found at https://www.spigotmc.org/resources/68965.
-chat-format: "{prefix}{name}&r: {message}"
+# {name} - the player's username
+# {displayname} - the player's nickname
+# {world} - current world of the player
+# {prefix} - player's highest priority prefix
+# {suffix} - player's highest priority suffix
+# {prefixes} - all prefixes (sorted by priority)
+# {suffixes} - all suffixes (sorted by priority)
+# {username-color} - username color from LuckPerms meta
+# {message-color} - message color from LuckPerms meta
 
-# Set the format per group.
-# Note: Option for more advanced users. Remove comments to run.
+# Default chat format for players without a group-specific format
+chat-format: "{prefix}{username-color}{name}&r: {message-color}{message}"
+
+# Group-specific formats
 group-formats:
-#  default: "[default] {name}&r: {message}"
-#  admin: "[admin] {name}&r: {message}"
+  # Default group
+  default: "{prefix}&f{name}&r: {message}" # &f = white, resets after prefix
+  # VIP group with fancy hex colors
+  #vip: "&#FFD700{prefix}&#FFD700{name}&r: &#FFFAAA{message}" # Gold-ish username and pale yellow message
+  # Moderator/Staff group
+  #mod: "&#00FFAA{prefix}&#00FFAA{name}&r: &#00FFDD{message}" # Cyan-green username, bright cyan message
+  # Admin group
+  #admin: "&#FF5555{prefix}&#FF5555{name}&r: &#FFAAAA{message}" # Bright red username, lighter red message
+
+# =============================
+# Notes
+# =============================
+# - Hex codes must be prefixed with '&#' and 6-digit hex (e.g., &#FF0000)
+# - You can mix & codes and hex codes
+# - Use {prefix} and {suffix} only if you set them in LuckPerms
+# - {username-color} and {message-color} are optional meta keys from LuckPerms
+# - You can create new groups by adding entries under group-formats
+# - PlaceholderAPI placeholders can be included, e.g., {player_health}, {vault_eco_balance}
